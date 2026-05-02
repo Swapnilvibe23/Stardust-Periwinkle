@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ChildSelector from "@/components/ChildSelector";
+import { StreakBadge } from "@/components/StreakBadge";
 import { TimeBasedSuggestion } from "@/components/TimeBasedSuggestion";
 import { useChild } from "@/contexts/ChildContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
@@ -73,6 +74,9 @@ export default function HomeScreen() {
           )}
         </View>
       </View>
+
+      {/* Daily streak */}
+      <StreakBadge />
 
       {/* Time-based contextual suggestion */}
       <TimeBasedSuggestion />
