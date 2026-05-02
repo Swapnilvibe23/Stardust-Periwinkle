@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ChildSelector from "@/components/ChildSelector";
 import { useChild } from "@/contexts/ChildContext";
 import { useColors } from "@/hooks/useColors";
+import { SYSTEME_IO_URL } from "@/constants/monetization";
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -31,6 +32,11 @@ export default function HomeScreen() {
   function nav(route: string) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push(route as any);
+  }
+
+  function openUpgrade() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    WebBrowser.openBrowserAsync(SYSTEME_IO_URL);
   }
 
   return (
@@ -105,21 +111,36 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <LinearGradient
-        colors={["#F7E8F0", "#EDE0F5"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={s.ctaBanner}
-      >
-        <Text style={s.ctaTitle}>Want a full month of ready-to-use routines, activities, and meal plans?</Text>
-        <Pressable
-          style={s.ctaButton}
-          onPress={() => WebBrowser.openBrowserAsync("https://stardustandperiwinkle.com")}
+      {/* Monetization CTA banner */}
+      <Pressable onPress={openUpgrade} style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}>
+        <LinearGradient
+          colors={["#F7E8F0", "#EDE0F5"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={s.ctaBanner}
         >
-          <Text style={s.ctaButtonText}>Learn More</Text>
-          <Feather name="external-link" size={14} color={colors.primary} />
-        </Pressable>
-      </LinearGradient>
+          <View style={s.ctaIconRow}>
+            <View style={s.ctaIconWrap}>
+              <Feather name="package" size={16} color="#B83A6B" />
+            </View>
+            <Text style={s.ctaEyebrow}>Monthly Pack</Text>
+          </View>
+          <Text style={s.ctaTitle}>
+            Want a full month of ready-to-use routines, activities, and meal plans?
+          </Text>
+          <Text style={s.ctaSub}>
+            30+ done-for-you days — no guessing, no planning, just show up.
+          </Text>
+          <View style={s.ctaButton}>
+            <Text style={s.ctaButtonText}>Learn More</Text>
+            <Feather name="external-link" size={13} color="#B83A6B" />
+          </View>
+
+          <Text style={s.privacyNote}>
+            🔒 Your data is private and used only to improve your experience.
+          </Text>
+        </LinearGradient>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -171,7 +192,10 @@ function SecondaryButton({
 }) {
   return (
     <Pressable
-      style={({ pressed }) => [sbs.card, { backgroundColor: colors.card, opacity: pressed ? 0.8 : 1 }]}
+      style={({ pressed }) => [
+        sbs.card,
+        { backgroundColor: colors.card, opacity: pressed ? 0.8 : 1 },
+      ]}
       onPress={onPress}
     >
       <Feather name={icon as any} size={20} color={colors.primary} />
@@ -201,14 +225,8 @@ const pbs = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-  },
-  desc: {
-    fontSize: 12,
-    marginTop: 2,
-  },
+  label: { fontSize: 16, fontWeight: "700" as const },
+  desc: { fontSize: 12, marginTop: 2 },
 });
 
 const sbs = StyleSheet.create({
@@ -226,27 +244,14 @@ const sbs = StyleSheet.create({
     elevation: 1,
     minHeight: 90,
   },
-  label: {
-    fontSize: 13,
-    fontWeight: "600" as const,
-    textAlign: "center",
-  },
+  label: { fontSize: 13, fontWeight: "600" as const, textAlign: "center" },
 });
 
 function makeStyles(colors: ReturnType<typeof useColors>) {
   return StyleSheet.create({
-    container: {
-      paddingHorizontal: 20,
-    },
-    header: {
-      alignItems: "center",
-      marginBottom: 28,
-    },
-    logo: {
-      width: 100,
-      height: 100,
-      marginBottom: 8,
-    },
+    container: { paddingHorizontal: 20 },
+    header: { alignItems: "center", marginBottom: 28 },
+    logo: { width: 100, height: 100, marginBottom: 8 },
     title: {
       fontSize: 22,
       fontWeight: "800" as const,
@@ -261,9 +266,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       marginTop: 4,
       marginBottom: 12,
     },
-    selectorRow: {
-      marginTop: 4,
-    },
+    selectorRow: { marginTop: 4 },
     addChildPrompt: {
       flexDirection: "row",
       alignItems: "center",
@@ -273,14 +276,8 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       paddingVertical: 8,
       borderRadius: 20,
     },
-    addChildText: {
-      fontSize: 13,
-      color: colors.primary,
-      fontWeight: "600" as const,
-    },
-    section: {
-      marginBottom: 20,
-    },
+    addChildText: { fontSize: 13, color: colors.primary, fontWeight: "600" as const },
+    section: { marginBottom: 20 },
     sectionLabel: {
       fontSize: 12,
       fontWeight: "700" as const,
@@ -289,35 +286,61 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       letterSpacing: 0.8,
       marginBottom: 10,
     },
-    secondaryRow: {
+    secondaryRow: { flexDirection: "row", gap: 10 },
+    ctaBanner: { borderRadius: 20, padding: 20, gap: 8 },
+    ctaIconRow: {
       flexDirection: "row",
-      gap: 10,
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 2,
     },
-    ctaBanner: {
-      borderRadius: 20,
-      padding: 20,
-      gap: 12,
+    ctaIconWrap: {
+      width: 28,
+      height: 28,
+      borderRadius: 8,
+      backgroundColor: "rgba(184,58,107,0.12)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    ctaEyebrow: {
+      fontSize: 11,
+      fontWeight: "700" as const,
+      color: "#B83A6B",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
     },
     ctaTitle: {
-      fontSize: 14,
-      fontWeight: "600" as const,
+      fontSize: 15,
+      fontWeight: "700" as const,
       color: "#4A2D5A",
-      lineHeight: 20,
+      lineHeight: 22,
+    },
+    ctaSub: {
+      fontSize: 12,
+      color: "#6B4A7E",
+      lineHeight: 18,
     },
     ctaButton: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
       alignSelf: "flex-start",
-      backgroundColor: "rgba(255,255,255,0.7)",
+      backgroundColor: "rgba(255,255,255,0.75)",
       paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: 20,
+      marginTop: 4,
     },
     ctaButtonText: {
       fontSize: 13,
       fontWeight: "700" as const,
       color: "#B83A6B",
+    },
+    privacyNote: {
+      fontSize: 11,
+      color: "#9B7BAF",
+      marginTop: 6,
+      textAlign: "center",
     },
   });
 }

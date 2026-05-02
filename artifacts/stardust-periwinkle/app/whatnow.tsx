@@ -11,10 +11,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { UpgradeBanner } from "@/components/UpgradeBanner";
+import { UsageIndicator } from "@/components/UsageIndicator";
 import { useChild } from "@/contexts/ChildContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useRecentActivities } from "@/hooks/useRecentActivities";
 import { useColors } from "@/hooks/useColors";
+import { useDailyLimit } from "@/hooks/useDailyLimit";
+import { DAILY_LIMITS } from "@/constants/monetization";
 import { ActivityResult, getActivity } from "@/utils/content";
 
 const TIMES = ["10 min", "20 min", "30 min", "1 hour"];
@@ -27,19 +31,28 @@ export default function WhatNowScreen() {
   const { addFavorite, isFavorited } = useFavorites();
   const { activeChild } = useChild();
   const { recentIds, markUsed } = useRecentActivities();
+  const { usedToday, remaining, isAtLimit, increment, loaded } = useDailyLimit(
+    "whatnow",
+    DAILY_LIMITS.whatnow
+  );
 
   const [time, setTime] = useState("20 min");
   const [energy, setEnergy] = useState("Medium");
   const [context, setContext] = useState("Indoors");
   const [result, setResult] = useState<ActivityResult | null>(null);
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
 
   const s = makeStyles(colors);
 
-  function generate() {
+  async function generate() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const activity = getActivity(energy, context, time, recentIds, activeChild?.ageRange);
     setResult(activity);
     markUsed(activity.id);
+    const newCount = await increment();
+    if (newCount >= DAILY_LIMITS.whatnow) {
+      setShowUpgradeBanner(true);
+    }
   }
 
   function save() {
@@ -104,7 +117,19 @@ export default function WhatNowScreen() {
         </View>
       )}
 
-      <TouchableOpacity style={s.generateButton} onPress={generate} activeOpacity={0.8}>
+      {loaded && (
+        <UsageIndicator
+          remaining={remaining}
+          limit={DAILY_LIMITS.whatnow}
+          featureName="What Now?"
+        />
+      )}
+
+      <TouchableOpacity
+        style={[s.generateButton, isAtLimit && s.generateButtonAtLimit]}
+        onPress={generate}
+        activeOpacity={0.8}
+      >
         <Text style={s.generateButtonText}>Find an Activity</Text>
       </TouchableOpacity>
 
@@ -163,7 +188,19 @@ export default function WhatNowScreen() {
               <Text style={s.tryAnotherText}>Try Another</Text>
             </Pressable>
           </View>
+
+          {showUpgradeBanner && (
+            <UpgradeBanner
+              variant="limit"
+              onDismiss={() => setShowUpgradeBanner(false)}
+            />
+          )}
         </View>
+      )}
+
+      {/* Soft nudge after several uses, even before hitting limit */}
+      {!result && usedToday >= 3 && !isAtLimit && (
+        <UpgradeBanner variant="soft" />
       )}
     </ScrollView>
   );
@@ -290,6 +327,9 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       padding: 16,
       alignItems: "center",
       marginTop: 20,
+    },
+    generateButtonAtLimit: {
+      backgroundColor: "#9FAAD8",
     },
     generateButtonText: { color: "#fff", fontSize: 16, fontWeight: "700" as const },
     result: {
