@@ -1,0 +1,180 @@
+Build a mobile app using React Native with Expo.
+
+App Name: Stardust & Periwinkle
+
+Subtitle:
+Making mom-life a little easier
+
+Purpose:
+A parent-facing mobile app that helps parents handle stressful parenting moments for children aged 1–8.
+
+IMPORTANT COMPLIANCE:
+- This is a PARENT-FACING app (NOT for children to use independently)
+- Do NOT collect personal data from children
+- All data stored locally only (AsyncStorage)
+- No tracking, no analytics, no ads
+- No social features
+- No external data sharing
+- Include simple Privacy Notice screen (static)
+
+------------------------------------
+
+MULTI-CHILD SUPPORT:
+
+Allow up to MAX 3 child profiles.
+
+Each profile includes:
+- Child name (optional nickname allowed)
+- Age range: 1–2, 3–4, 5–6, 7–8
+- Favorite themes
+- Common struggles
+
+UI:
+- Show “Active Child” selector at top of Home screen
+- All features use selected child context
+
+------------------------------------
+
+NAVIGATION:
+Bottom tabs:
+- Home
+- Favorites
+- Profile
+
+------------------------------------
+
+HOME SCREEN:
+
+Title: Stardust & Periwinkle
+Subtitle: Making mom-life a little easier
+
+Top:
+Active Child selector (dropdown or toggle)
+
+Primary buttons:
+- Calm This Moment
+- What Now?
+- Last Story Tonight
+
+Secondary:
+- Let’s Get Through This
+- Take a Breath
+
+CTA:
+“Want a full month of ready-to-use routines, activities, and meal plans?”
+Button opens external link
+
+------------------------------------
+
+FEATURE 1: Calm This Moment
+
+Inputs:
+- Scenario (5 predefined)
+- Time (2 / 5 / 10 min)
+- Use ACTIVE CHILD age
+
+Output:
+- Step 1: What to say
+- Step 2: What to do
+- Step 3: What to try
+- 1 activity
+- 1 calming action
+
+Add “Save to Favorites”
+
+------------------------------------
+
+FEATURE 2: What Now?
+
+Inputs:
+- Time
+- Energy
+- Context
+- Use ACTIVE CHILD
+
+Output:
+ONLY ONE activity:
+- Title
+- Materials
+- Steps (3–5)
+- Why it works
+- Save button
+
+------------------------------------
+
+FEATURE 3: Last Story Tonight
+
+Inputs:
+- Use ACTIVE CHILD name
+- Theme
+- Energy level
+
+Output:
+Template-based bedtime story
+
+Rules:
+- Calm tone
+- No stimulation
+- Predictable ending
+- Sleep cue ending
+
+UI:
+Dark, calm screen
+
+------------------------------------
+
+FEATURE 4: Let’s Get Through This
+
+Routines:
+- Morning chaos
+- Bedtime
+- Hangry time
+
+Each:
+- 5–7 steps
+- Action + script
+
+------------------------------------
+
+FEATURE 5: Take a Breath
+
+Output:
+- 1 validation line
+- 1 grounding action
+- 1 child activity
+
+------------------------------------
+
+FAVORITES:
+Local storage only
+
+------------------------------------
+
+PROFILE:
+
+- Manage up to 3 children
+- Add / edit / remove profiles
+- Select active child
+
+------------------------------------
+
+PRIVACY SCREEN:
+
+Add simple static page:
+- App is for parents
+- No child data collection
+- No tracking
+- No ads
+
+------------------------------------
+
+TECH:
+- React Native + Expo
+- TypeScript
+- AsyncStorage
+
+DO NOT ADD:
+- Backend
+- Login
+- Payments
+- AI

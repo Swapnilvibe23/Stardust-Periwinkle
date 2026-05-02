@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "HElFrLmdVUDsdEXANTAH6"
+uri = "file://artifacts/stardust-periwinkle/assets/images/icon.png"
+type = "image"
+title = "stardust periwinkle app icon"
+
+[[generated]]
+id = "gM30Hw3L2v8McQOqxKTmH"
+uri = "file://artifacts/stardust-periwinkle/assets/images/splash.png"
+type = "image"
+title = "stardust periwinkle splash"
