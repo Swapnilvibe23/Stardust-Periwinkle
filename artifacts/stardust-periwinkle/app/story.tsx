@@ -26,15 +26,16 @@ export default function StoryScreen() {
   const [energy, setEnergy] = useState<string>("Tired");
   const [story, setStory] = useState<StoryResult | null>(null);
 
-  const isDark = true;
-  const bg = "#1A0D1F";
-  const textColor = "#E8D5F5";
   const accentColor = "#C9A0DC";
   const mutedColor = "#9B7BAF";
+  const bg = "#1A0D1F";
+  const textColor = "#E8D5F5";
 
   function generate() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setStory(getStory(theme, energy, activeChild?.name || "Little One"));
+    setStory(
+      getStory(theme, energy, activeChild?.name || "Little One", activeChild?.ageRange)
+    );
   }
 
   function save() {
@@ -60,7 +61,7 @@ export default function StoryScreen() {
         <Feather name="moon" size={28} color={accentColor} />
         <Text style={[s.heading, { color: textColor }]}>Last Story Tonight</Text>
         <Text style={[s.subheading, { color: mutedColor }]}>
-          {activeChild ? `For ${activeChild.name}` : "A calm bedtime story"}
+          {activeChild ? `For ${activeChild.name} · Ages ${activeChild.ageRange}` : "A calm bedtime story"}
         </Text>
       </View>
 
@@ -70,10 +71,15 @@ export default function StoryScreen() {
           {STORY_THEMES.map((t) => (
             <TouchableOpacity
               key={t}
-              style={[s.themeChip, theme === t && { backgroundColor: accentColor + "30", borderColor: accentColor }]}
+              style={[
+                s.themeChip,
+                theme === t && { backgroundColor: accentColor + "30", borderColor: accentColor },
+              ]}
               onPress={() => { setTheme(t); setStory(null); }}
             >
-              <Text style={[s.themeText, { color: mutedColor }, theme === t && { color: accentColor }]}>{t}</Text>
+              <Text style={[s.themeText, { color: mutedColor }, theme === t && { color: accentColor }]}>
+                {t}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -84,15 +90,24 @@ export default function StoryScreen() {
         {STORY_ENERGIES.map((e) => (
           <TouchableOpacity
             key={e}
-            style={[s.energyChip, energy === e && { backgroundColor: accentColor + "30", borderColor: accentColor }]}
+            style={[
+              s.energyChip,
+              energy === e && { backgroundColor: accentColor + "30", borderColor: accentColor },
+            ]}
             onPress={() => { setEnergy(e); setStory(null); }}
           >
-            <Text style={[s.energyText, { color: mutedColor }, energy === e && { color: accentColor }]}>{e}</Text>
+            <Text style={[s.energyText, { color: mutedColor }, energy === e && { color: accentColor }]}>
+              {e}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <TouchableOpacity style={[s.generateButton, { backgroundColor: accentColor }]} onPress={generate} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[s.generateButton, { backgroundColor: accentColor }]}
+        onPress={generate}
+        activeOpacity={0.8}
+      >
         <Feather name="book-open" size={16} color="#1A0D1F" />
         <Text style={[s.generateText, { color: "#1A0D1F" }]}>Tell Me the Story</Text>
       </TouchableOpacity>
@@ -104,21 +119,37 @@ export default function StoryScreen() {
 
           <View style={[s.sleepCue, { borderTopColor: accentColor + "30" }]}>
             <Feather name="moon" size={14} color={accentColor} />
-            <Text style={[s.sleepCueText, { color: mutedColor }]}>
-              Read slowly. Pause at each line. Let silence do the work.
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[s.sleepCueText, { color: mutedColor }]}>
+                {story.readingNote || "Read slowly. Pause at each line. Let silence do the work."}
+              </Text>
+            </View>
           </View>
 
-          <Pressable
-            style={[s.saveButton, { borderColor: alreadySaved ? "#444" : accentColor }]}
-            onPress={save}
-            disabled={alreadySaved}
-          >
-            <Feather name={alreadySaved ? "check" : "heart"} size={14} color={alreadySaved ? "#666" : accentColor} />
-            <Text style={[s.saveText, { color: alreadySaved ? "#666" : accentColor }]}>
-              {alreadySaved ? "Saved" : "Save Story"}
-            </Text>
-          </Pressable>
+          <View style={s.storyActions}>
+            <Pressable
+              style={[s.saveButton, { borderColor: alreadySaved ? "#444" : accentColor, flex: 1 }]}
+              onPress={save}
+              disabled={alreadySaved}
+            >
+              <Feather
+                name={alreadySaved ? "check" : "heart"}
+                size={14}
+                color={alreadySaved ? "#666" : accentColor}
+              />
+              <Text style={[s.saveText, { color: alreadySaved ? "#666" : accentColor }]}>
+                {alreadySaved ? "Saved" : "Save Story"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[s.retellButton, { flex: 1 }]}
+              onPress={generate}
+            >
+              <Feather name="refresh-cw" size={14} color={mutedColor} />
+              <Text style={[s.retellText, { color: mutedColor }]}>Different Story</Text>
+            </Pressable>
+          </View>
         </View>
       )}
     </ScrollView>
@@ -181,6 +212,7 @@ const s = StyleSheet.create({
     borderTopWidth: 1,
   },
   sleepCueText: { fontSize: 12, lineHeight: 18, flex: 1, fontStyle: "italic" },
+  storyActions: { flexDirection: "row", gap: 10, marginTop: 16 },
   saveButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -189,7 +221,17 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 10,
     padding: 12,
-    marginTop: 16,
   },
   saveText: { fontSize: 13, fontWeight: "600" as const },
+  retellButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: "#3D2550",
+    borderRadius: 10,
+    padding: 12,
+  },
+  retellText: { fontSize: 13, fontWeight: "600" as const },
 });
