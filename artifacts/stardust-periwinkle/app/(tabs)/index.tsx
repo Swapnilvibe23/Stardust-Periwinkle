@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ChildSelector from "@/components/ChildSelector";
+import { MoodCheckIn } from "@/components/MoodCheckIn";
 import { StreakBadge } from "@/components/StreakBadge";
 import { TimeBasedSuggestion } from "@/components/TimeBasedSuggestion";
 import { useChild } from "@/contexts/ChildContext";
@@ -74,6 +75,9 @@ export default function HomeScreen() {
           )}
         </View>
       </View>
+
+      {/* Mood check-in — once per day, personalises next suggestion */}
+      <MoodCheckIn />
 
       {/* Daily streak */}
       <StreakBadge />
