@@ -16,6 +16,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ChildProvider } from "@/contexts/ChildContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { requestAndScheduleNotifications } from "@/hooks/useNotifications";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -46,6 +47,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
+      // Request notification permissions and schedule after fonts load
+      requestAndScheduleNotifications();
     }
   }, [fontsLoaded, fontError]);
 

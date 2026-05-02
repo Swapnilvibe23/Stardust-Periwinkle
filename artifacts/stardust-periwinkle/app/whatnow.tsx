@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { FavoritesBoost } from "@/components/FavoritesBoost";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { UsageIndicator } from "@/components/UsageIndicator";
 import { useChild } from "@/contexts/ChildContext";
@@ -50,9 +51,7 @@ export default function WhatNowScreen() {
     setResult(activity);
     markUsed(activity.id);
     const newCount = await increment();
-    if (newCount >= DAILY_LIMITS.whatnow) {
-      setShowUpgradeBanner(true);
-    }
+    if (newCount >= DAILY_LIMITS.whatnow) setShowUpgradeBanner(true);
   }
 
   function save() {
@@ -86,27 +85,12 @@ export default function WhatNowScreen() {
         </View>
       )}
 
-      <OptionRow
-        label="Time Available"
-        options={TIMES}
-        selected={time}
-        onSelect={(v) => { setTime(v); setResult(null); }}
-        colors={colors}
-      />
-      <OptionRow
-        label="Energy Level"
-        options={ENERGIES}
-        selected={energy}
-        onSelect={(v) => { setEnergy(v); setResult(null); }}
-        colors={colors}
-      />
-      <OptionRow
-        label="Where Are You?"
-        options={CONTEXTS}
-        selected={context}
-        onSelect={(v) => { setContext(v); setResult(null); }}
-        colors={colors}
-      />
+      {/* Saved activity shortcut */}
+      <FavoritesBoost type="activity" limit={2} />
+
+      <OptionRow label="Time Available" options={TIMES} selected={time} onSelect={(v) => { setTime(v); setResult(null); }} colors={colors} />
+      <OptionRow label="Energy Level" options={ENERGIES} selected={energy} onSelect={(v) => { setEnergy(v); setResult(null); }} colors={colors} />
+      <OptionRow label="Where Are You?" options={CONTEXTS} selected={context} onSelect={(v) => { setContext(v); setResult(null); }} colors={colors} />
 
       {recentIds.length > 0 && !result && (
         <View style={s.recentNote}>
@@ -118,11 +102,7 @@ export default function WhatNowScreen() {
       )}
 
       {loaded && (
-        <UsageIndicator
-          remaining={remaining}
-          limit={DAILY_LIMITS.whatnow}
-          featureName="What Now?"
-        />
+        <UsageIndicator remaining={remaining} limit={DAILY_LIMITS.whatnow} featureName="What Now?" />
       )}
 
       <TouchableOpacity
@@ -173,11 +153,7 @@ export default function WhatNowScreen() {
               onPress={save}
               disabled={alreadySaved}
             >
-              <Feather
-                name={alreadySaved ? "check" : "heart"}
-                size={16}
-                color={alreadySaved ? colors.mutedForeground : colors.accent}
-              />
+              <Feather name={alreadySaved ? "check" : "heart"} size={16} color={alreadySaved ? colors.mutedForeground : colors.accent} />
               <Text style={[s.saveText, alreadySaved && { color: colors.mutedForeground }]}>
                 {alreadySaved ? "Saved" : "Save"}
               </Text>
@@ -190,34 +166,19 @@ export default function WhatNowScreen() {
           </View>
 
           {showUpgradeBanner && (
-            <UpgradeBanner
-              variant="limit"
-              onDismiss={() => setShowUpgradeBanner(false)}
-            />
+            <UpgradeBanner variant="limit" onDismiss={() => setShowUpgradeBanner(false)} />
           )}
         </View>
       )}
 
-      {/* Soft nudge after several uses, even before hitting limit */}
-      {!result && usedToday >= 3 && !isAtLimit && (
-        <UpgradeBanner variant="soft" />
-      )}
+      {!result && usedToday >= 3 && !isAtLimit && <UpgradeBanner variant="soft" />}
     </ScrollView>
   );
 }
 
-function OptionRow({
-  label,
-  options,
-  selected,
-  onSelect,
-  colors,
-}: {
-  label: string;
-  options: string[];
-  selected: string;
-  onSelect: (v: string) => void;
-  colors: ReturnType<typeof useColors>;
+function OptionRow({ label, options, selected, onSelect, colors }: {
+  label: string; options: string[]; selected: string;
+  onSelect: (v: string) => void; colors: ReturnType<typeof useColors>;
 }) {
   return (
     <View style={{ marginBottom: 4 }}>
@@ -226,20 +187,12 @@ function OptionRow({
         {options.map((opt) => (
           <TouchableOpacity
             key={opt}
-            style={[
-              or.chip,
-              { backgroundColor: colors.muted, borderColor: colors.border },
-              selected === opt && { backgroundColor: colors.secondary, borderColor: colors.accent },
-            ]}
+            style={[or.chip, { backgroundColor: colors.muted, borderColor: colors.border },
+              selected === opt && { backgroundColor: colors.secondary, borderColor: colors.accent }]}
             onPress={() => onSelect(opt)}
           >
-            <Text
-              style={[
-                or.chipText,
-                { color: colors.mutedForeground },
-                selected === opt && { color: colors.accent, fontWeight: "700" as const },
-              ]}
-            >
+            <Text style={[or.chipText, { color: colors.mutedForeground },
+              selected === opt && { color: colors.accent, fontWeight: "700" as const }]}>
               {opt}
             </Text>
           </TouchableOpacity>
@@ -249,27 +202,10 @@ function OptionRow({
   );
 }
 
-function Section({
-  label,
-  colors,
-  children,
-}: {
-  label: string;
-  colors: ReturnType<typeof useColors>;
-  children: React.ReactNode;
-}) {
+function Section({ label, colors, children }: { label: string; colors: ReturnType<typeof useColors>; children: React.ReactNode }) {
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text
-        style={{
-          fontSize: 11,
-          fontWeight: "700" as const,
-          textTransform: "uppercase",
-          letterSpacing: 0.6,
-          marginBottom: 8,
-          color: colors.mutedForeground,
-        }}
-      >
+      <Text style={{ fontSize: 11, fontWeight: "700" as const, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8, color: colors.mutedForeground }}>
         {label}
       </Text>
       {children}
@@ -278,14 +214,7 @@ function Section({
 }
 
 const or = StyleSheet.create({
-  label: {
-    fontSize: 12,
-    fontWeight: "700" as const,
-    textTransform: "uppercase",
-    letterSpacing: 0.7,
-    marginTop: 16,
-    marginBottom: 8,
-  },
+  label: { fontSize: 12, fontWeight: "700" as const, textTransform: "uppercase", letterSpacing: 0.7, marginTop: 16, marginBottom: 8 },
   row: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5 },
   chipText: { fontSize: 13, fontWeight: "500" as const },
@@ -295,113 +224,36 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
   return StyleSheet.create({
     container: { paddingHorizontal: 20 },
     contextNote: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      backgroundColor: colors.secondary,
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      alignSelf: "flex-start",
-      marginBottom: 4,
+      flexDirection: "row", alignItems: "center", gap: 5,
+      backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 10,
+      paddingVertical: 6, alignSelf: "flex-start", marginBottom: 4,
     },
     contextNoteText: { fontSize: 12, color: colors.accent, fontWeight: "500" as const },
-    recentNote: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      marginTop: 10,
-      marginBottom: 2,
-    },
+    recentNote: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 10, marginBottom: 2 },
     recentNoteText: { fontSize: 12, color: colors.mutedForeground },
-    sectionLabel: {
-      fontSize: 11,
-      fontWeight: "700" as const,
-      textTransform: "uppercase",
-      letterSpacing: 0.5,
-      marginBottom: 6,
-    },
-    generateButton: {
-      backgroundColor: colors.accent,
-      borderRadius: 14,
-      padding: 16,
-      alignItems: "center",
-      marginTop: 20,
-    },
-    generateButtonAtLimit: {
-      backgroundColor: "#9FAAD8",
-    },
+    sectionLabel: { fontSize: 11, fontWeight: "700" as const, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 },
+    generateButton: { backgroundColor: colors.accent, borderRadius: 14, padding: 16, alignItems: "center", marginTop: 20 },
+    generateButtonAtLimit: { backgroundColor: "#9FAAD8" },
     generateButtonText: { color: "#fff", fontSize: 16, fontWeight: "700" as const },
     result: {
-      marginTop: 24,
-      backgroundColor: colors.card,
-      borderRadius: 20,
-      padding: 18,
-      shadowColor: "#000",
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 2,
+      marginTop: 24, backgroundColor: colors.card, borderRadius: 20, padding: 18,
+      shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2,
     },
-    resultHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      marginBottom: 20,
-    },
-    resultIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 14,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    resultHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 20 },
+    resultIcon: { width: 48, height: 48, borderRadius: 14, alignItems: "center", justifyContent: "center" },
     resultTitle: { fontSize: 18, fontWeight: "800" as const, color: colors.foreground, flex: 1 },
-    dot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.primary,
-      marginTop: 7,
-      flexShrink: 0,
-    },
+    dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.primary, marginTop: 7, flexShrink: 0 },
     listItem: { flexDirection: "row", gap: 10, marginBottom: 6, alignItems: "flex-start" },
     listText: { fontSize: 14, color: colors.foreground, lineHeight: 21, flex: 1 },
     stepItem: { flexDirection: "row", gap: 10, marginBottom: 10, alignItems: "flex-start" },
-    stepNum: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-      marginTop: 1,
-    },
+    stepNum: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 },
     stepNumText: { color: "#fff", fontSize: 11, fontWeight: "800" as const },
     whyCard: { borderRadius: 12, padding: 14, marginBottom: 16 },
     whyText: { fontSize: 14, color: colors.foreground, lineHeight: 21 },
     actionRow: { flexDirection: "row", gap: 10 },
-    saveButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 8,
-      borderWidth: 2,
-      borderColor: colors.accent,
-      borderRadius: 12,
-      padding: 12,
-    },
+    saveButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderWidth: 2, borderColor: colors.accent, borderRadius: 12, padding: 12 },
     saveText: { fontSize: 14, fontWeight: "600" as const, color: colors.accent },
-    tryAnotherButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 8,
-      borderWidth: 2,
-      borderColor: colors.border,
-      borderRadius: 12,
-      padding: 12,
-    },
+    tryAnotherButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderWidth: 2, borderColor: colors.border, borderRadius: 12, padding: 12 },
     tryAnotherText: { fontSize: 14, fontWeight: "600" as const, color: colors.mutedForeground },
   });
 }
