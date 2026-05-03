@@ -112,7 +112,7 @@ export default function ProfileScreen() {
         <View key={child.id} style={[s.childCard, activeChild?.id === child.id && s.childCardActive]}>
           <Pressable style={s.childMain} onPress={() => setActiveChild(child.id)}>
             <View style={[s.avatar, activeChild?.id === child.id && s.avatarActive]}>
-              <Text style={[s.avatarText, activeChild?.id === child.id && { color: "#fff" }]}>
+              <Text style={[s.avatarText, activeChild?.id === child.id && { color: "#fff" }]}> 
                 {child.name.charAt(0).toUpperCase() || "?"}
               </Text>
             </View>
@@ -153,6 +153,19 @@ export default function ProfileScreen() {
 
       <View style={s.divider} />
 
+      <View style={s.sectionHeader}>
+        <Feather name="book-open" size={14} color={colors.primary} />
+        <Text style={s.sectionLabel}>Resources</Text>
+      </View>
+      <Text style={s.sectionText}>
+        A collection of my books, printables, and digital products.
+      </Text>
+      <TouchableOpacity style={s.resourcesButton} onPress={() => router.push("/resources" as any)}>
+        <Feather name="shopping-bag" size={16} color={colors.primary} />
+        <Text style={s.resourcesButtonText}>Open Resources</Text>
+        <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+      </TouchableOpacity>
+
       <TouchableOpacity style={s.privacyLink} onPress={() => router.push("/privacy" as any)}>
         <Feather name="shield" size={14} color={colors.accent} />
         <Text style={s.privacyLinkText}>Privacy Notice</Text>
@@ -165,7 +178,7 @@ export default function ProfileScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={[s.modal, { paddingBottom: insets.bottom + 20 }]}>
+        <View style={[s.modal, { paddingBottom: insets.bottom + 20 }]}> 
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>{editingId ? "Edit Child" : "Add Child"}</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -319,6 +332,19 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     },
     addButtonText: { fontSize: 14, fontWeight: "600" as const, color: colors.primary },
     divider: { height: 1, backgroundColor: colors.border, marginVertical: 12 },
+    sectionHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
+    sectionLabel: { fontSize: 12, fontWeight: "700" as const, color: colors.primary, textTransform: "uppercase", letterSpacing: 0.6 },
+    sectionText: { fontSize: 13, color: colors.mutedForeground, lineHeight: 19, marginBottom: 10 },
+    resourcesButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      padding: 14,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      marginBottom: 10,
+    },
+    resourcesButtonText: { flex: 1, fontSize: 14, color: colors.primary, fontWeight: "600" as const },
     privacyLink: {
       flexDirection: "row",
       alignItems: "center",
