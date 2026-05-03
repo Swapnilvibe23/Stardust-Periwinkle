@@ -13,15 +13,35 @@ pnpm workspace monorepo using TypeScript. Contains a shared API server and a Rea
 - **Storage**: 100% local — AsyncStorage only. No backend required.
 
 #### Features
-1. **Home Screen** — Active child selector, 5 feature buttons, CTA banner
-2. **Calm This Moment** — Template-based guidance by scenario + age range
-3. **What Now?** — Activity suggestions by time/energy/context
+1. **Home Screen** — Mood check-in, daily streak, time-based suggestion, 5 feature buttons, CTA banner
+2. **Calm This Moment** — Template-based guidance by scenario + age range; Favorites Boost; daily soft limit (5/day)
+3. **What Now?** — Activity suggestions by time/energy/context; recent dedup; Favorites Boost; daily soft limit
 4. **Last Story Tonight** — Dark-mode bedtime stories by theme/energy
-5. **Let's Get Through This** — Step-by-step routines (Morning, Bedtime, Hangry Time)
+5. **Let's Get Through This** — Step-by-step routines (Morning, Bedtime, Hangry Time); bundle CTA at bottom
 6. **Take a Breath** — Animated breathing guide + validation/grounding cards
-7. **Favorites** — Save any output locally with expand/delete
-8. **Profile** — Manage up to 3 child profiles (name, age range, themes, struggles)
-9. **Privacy Notice** — Static compliance screen
+7. **Favorites** — Save any output locally; type filter pills; "used before" badges; time-nudge; bundle CTA
+8. **Shop** — 5 placeholder in-app purchase product cards; RevenueCat purchase + restore flow
+9. **Profile** — Manage up to 3 child profiles (name, age range, themes, struggles)
+10. **Privacy Notice** — Static compliance screen
+
+#### Retention & Engagement
+- **Push notifications**: 2/day max (8am + 7pm), parent-focused, skips on web (`hooks/useNotifications.ts`)
+- **Time-based suggestion**: Morning → Routine, Afternoon → Activities, Evening → Calm, Night → Story (`hooks/useTimeContext.ts`)
+- **Mood check-in**: Once/day 3-tap selector (Calm/Stressed/Exhausted), persists to AsyncStorage, routes to relevant feature
+- **Daily streak**: Consecutive-day counter, 7-dot visual, milestone messages at 3/7/14/21/30 days (`hooks/useStreak.ts`)
+- **Favorites Boost**: "From your saves" compact section in Calm + What Now? when relevant saves exist
+
+#### Monetization
+- **External CTA**: Systeme.io link (`constants/monetization.ts` → `SYSTEME_IO_URL`) — update with real URL
+- **Daily soft limits**: 5 free uses/day for Calm + What Now?, dismissible upgrade banner, no hard blocks
+- **In-app purchases (RevenueCat)**: Shop tab with 5 placeholder products — NOT YET ACTIVE
+  - `react-native-purchases` installed in `artifacts/stardust-periwinkle`
+  - `@replit/revenuecat-sdk` installed at workspace root
+  - `lib/revenuecat.tsx` — SubscriptionProvider + useSubscription hook
+  - `scripts/src/seedRevenueCat.ts` — run with `pnpm --filter @workspace/scripts run seedRevenueCat`
+  - `scripts/src/revenueCatClient.ts` — authenticated server-side client
+  - **PENDING**: RevenueCat connector not yet authorized. User dismissed the integration flow.
+    To activate: connect RevenueCat at app.revenuecat.com → get Secret key → store as `REVENUECAT_SECRET_KEY` secret → re-run seed script → set the 7 env vars it outputs.
 
 #### Compliance
 - Parent-facing ONLY — no child data collection

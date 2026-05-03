@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -17,8 +18,19 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ChildProvider } from "@/contexts/ChildContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { requestAndScheduleNotifications } from "@/hooks/useNotifications";
+import { SubscriptionProvider, initializeRevenueCat } from "@/lib/revenuecat";
 
 SplashScreen.preventAutoHideAsync();
+
+// Initialize RevenueCat at module level — safe to call before render
+try {
+  initializeRevenueCat();
+} catch (err: any) {
+  // Keys not yet configured — Shop screen will show "Coming Soon" states
+  if (__DEV__) {
+    console.warn("[RevenueCat] Not configured:", err?.message);
+  }
+}
 
 const queryClient = new QueryClient();
 
@@ -47,7 +59,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
-      // Request notification permissions and schedule after fonts load
       requestAndScheduleNotifications();
     }
   }, [fontsLoaded, fontError]);
@@ -58,15 +69,17 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <ChildProvider>
-            <FavoritesProvider>
-              <GestureHandlerRootView>
-                <KeyboardProvider>
-                  <RootLayoutNav />
-                </KeyboardProvider>
-              </GestureHandlerRootView>
-            </FavoritesProvider>
-          </ChildProvider>
+          <SubscriptionProvider>
+            <ChildProvider>
+              <FavoritesProvider>
+                <GestureHandlerRootView>
+                  <KeyboardProvider>
+                    <RootLayoutNav />
+                  </KeyboardProvider>
+                </GestureHandlerRootView>
+              </FavoritesProvider>
+            </ChildProvider>
+          </SubscriptionProvider>
         </QueryClientProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
